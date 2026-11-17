@@ -12,6 +12,7 @@ export interface AdminOverview {
   removed: number;
   suspended: number;
   occupiedTiles: number;
+  reservedTiles: number;
   availableTiles: number;
   wallCapacity: number;
 }
@@ -43,10 +44,13 @@ export async function getAdminOverview(): Promise<AdminOverview> {
   const db = getAdminClient();
   const empty: AdminOverview = {
     totalParticipants: 0, pending: 0, verified: 0, approved: 0, rejected: 0,
-    removed: 0, suspended: 0, occupiedTiles: 0,
+    removed: 0, suspended: 0, occupiedTiles: 0, reservedTiles: 0,
     availableTiles: WALL_CAPACITY, wallCapacity: WALL_CAPACITY,
   };
   if (!db) return empty;
+
+  // free any expired reservations before counting
+  await db.rpc("release_expired_reservations");
 
   const [pending, verified, approved, rejected, removed, suspended] =
     await Promise.all([
@@ -63,12 +67,19 @@ export async function getAdminOverview(): Promise<AdminOverview> {
     .select("id", { count: "exact", head: true })
     .eq("status", "occupied");
 
+  const { count: reserved } = await db
+    .from("wall_tiles")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "reserved");
+
   const occupiedTiles = occupied ?? 0;
+  const reservedTiles = reserved ?? 0;
   return {
     totalParticipants: pending + verified + approved + rejected + removed + suspended,
     pending, verified, approved, rejected, removed, suspended,
     occupiedTiles,
-    availableTiles: WALL_CAPACITY - occupiedTiles,
+    reservedTiles,
+    availableTiles: WALL_CAPACITY - occupiedTiles - reservedTiles,
     wallCapacity: WALL_CAPACITY,
   };
 }

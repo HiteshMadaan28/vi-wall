@@ -5,6 +5,11 @@ export interface WallStats {
   totalPlayers: number;
   totalTiles: number;
   wallCapacity: number;
+  availableTiles: number;
+  pendingReservations: number;
+  completionPercent: number;
+  completed: boolean;
+  completedAt: string | null;
   participatingCountries: number;
   fillPercent: number;
   leader: { iso: string; name: string; flag: string; tiles: number } | null;
@@ -20,6 +25,13 @@ export interface OccupiedTile {
   avatarUrl: string | null;
   /** 'approved' tiles are lit; 'verified' tiles are pending admin approval. */
   status: "approved" | "verified";
+}
+
+/** A tile that is currently reserved (mid-claim). No participant data exposed. */
+export interface ReservedTile {
+  tileIndex: number;
+  x: number;
+  y: number;
 }
 
 export interface PublicProfile {

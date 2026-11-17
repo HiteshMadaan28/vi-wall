@@ -54,7 +54,8 @@ const socialUrlSchema = z
   .optional()
   .or(z.literal(""));
 
-export const claimSchema = z.object({
+/** Fields the user fills in the claim form (no tile/token). */
+export const claimFormSchema = z.object({
   username: usernameSchema,
   email: z.string().trim().email("Enter a valid email.").max(254),
   countryIso: z
@@ -73,10 +74,18 @@ export const claimSchema = z.object({
   socialUrl: socialUrlSchema,
 });
 
-/** Output type (after Zod transforms/defaults) — what the server receives. */
+/** Full payload the server validates: form fields + the chosen block. */
+export const claimSchema = claimFormSchema.extend({
+  tileIndex: z.number().int().nonnegative(),
+  reservationToken: z.string().trim().min(10).max(80),
+});
+
+/** Full server payload type (form + tile) — what the API receives. */
 export type ClaimInput = z.output<typeof claimSchema>;
-/** Input type (before defaults) — what the form fields hold. */
-export type ClaimFormValues = z.input<typeof claimSchema>;
+/** Form field input type (before defaults) — what the form holds. */
+export type ClaimFormValues = z.input<typeof claimFormSchema>;
+/** Form field output type (after defaults) — what handleSubmit returns. */
+export type ClaimFormOutput = z.output<typeof claimFormSchema>;
 
 export const verifySchema = z.object({
   token: z.string().trim().min(10).max(200),

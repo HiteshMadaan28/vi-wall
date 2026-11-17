@@ -36,9 +36,10 @@ export async function POST(request: Request) {
 
   const db = getAdminClient()!;
 
-  // Atomic verify + tile allocation. Concurrency and double-allocation safety
-  // live inside this Postgres function (SELECT ... FOR UPDATE SKIP LOCKED).
-  const { data, error } = await db.rpc("verify_and_allocate", {
+  // Atomic verify + permanent occupation of the participant's RESERVED tile.
+  // Reservation validity, concurrency safety, and the one-time completion flag
+  // all live inside this Postgres function.
+  const { data, error } = await db.rpc("verify_and_occupy", {
     p_token: parsed.data.token,
     p_auto_approve: autoApprove(),
   });
@@ -46,8 +47,9 @@ export async function POST(request: Request) {
   if (error) {
     const map: Record<string, { status: number; message: string }> = {
       invalid_token: { status: 404, message: "This verification link is invalid or already used." },
-      already_verified: { status: 409, message: "This tile has already been verified." },
-      wall_full: { status: 409, message: "The wall is currently full. No tiles are available." },
+      already_verified: { status: 409, message: "This block has already been verified." },
+      no_reservation: { status: 409, message: "No block was reserved for this claim. Please claim again." },
+      reservation_expired: { status: 409, message: "Your block reservation expired. Please pick your block again." },
     };
     const known = Object.keys(map).find((k) => error.message.includes(k));
     if (known) {
@@ -75,6 +77,7 @@ export async function POST(request: Request) {
     y: row.out_y,
     countryIso: row.out_country_iso,
     countryRank,
+    completed: row.out_completed === true,
     autoApproved: autoApprove(),
   });
 }

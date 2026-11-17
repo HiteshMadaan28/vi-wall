@@ -70,6 +70,26 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "country_lookup_failed" }, { status: 500 });
   }
 
+  // The chosen tile must still be reserved with this token and not expired.
+  await db.rpc("release_expired_reservations");
+  const { data: tileRow } = await db
+    .from("wall_tiles")
+    .select("tile_index, status, reserved_until")
+    .eq("tile_index", input.tileIndex)
+    .eq("reservation_token", input.reservationToken)
+    .eq("status", "reserved")
+    .maybeSingle();
+
+  if (!tileRow) {
+    return NextResponse.json(
+      {
+        error: "reservation_expired",
+        message: "Your block reservation expired. Please pick your block again.",
+      },
+      { status: 409 }
+    );
+  }
+
   const usernameNormalized = normalizeUsername(input.username);
   const emailNormalized = input.email.trim().toLowerCase();
   const token = generateVerificationToken();
@@ -90,6 +110,8 @@ export async function POST(request: Request) {
       status: "pending_verification",
       verification_token: token,
       verification_sent_at: new Date().toISOString(),
+      reservation_token: input.reservationToken,
+      reserved_tile_index: input.tileIndex,
     });
 
   if (insertErr) {

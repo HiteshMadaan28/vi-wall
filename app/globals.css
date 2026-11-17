@@ -139,3 +139,22 @@ body {
   50% { opacity: 1; }
 }
 .animate-vi-pulse { animation: vi-pulse 2.4s ease-in-out infinite; }
+
+/* Completion celebration: a sunset gradient sweep + bloom. */
+@keyframes vi-sweep {
+  0% { transform: translateX(-120%) skewX(-12deg); opacity: 0; }
+  20% { opacity: 1; }
+  100% { transform: translateX(120%) skewX(-12deg); opacity: 0; }
+}
+@keyframes vi-bloom {
+  0% { opacity: 0; transform: scale(0.9); }
+  40% { opacity: 1; }
+  100% { opacity: 0.85; transform: scale(1); }
+}
+@keyframes vi-rise {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.vi-sweep { animation: vi-sweep 2.6s ease-in-out forwards; }
+.vi-bloom { animation: vi-bloom 1.6s ease-out forwards; }
+.vi-rise { animation: vi-rise 0.8s ease-out 0.9s both; }

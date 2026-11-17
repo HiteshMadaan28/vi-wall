@@ -86,7 +86,8 @@ export function AdminDashboard() {
         <Stat label="Pending" value={o?.pending} />
         <Stat label="Verified" value={o?.verified} />
         <Stat label="Approved" value={o?.approved} accent />
-        <Stat label="Occupied tiles" value={o?.occupiedTiles} />
+        <Stat label="Occupied" value={o?.occupiedTiles} />
+        <Stat label="Reserved" value={o?.reservedTiles} />
         <Stat label="Available" value={o?.availableTiles} />
       </div>
 

@@ -16,6 +16,8 @@ describe("claimSchema", () => {
     message: "Let's go India!",
     avatar: "violet-orb" as const,
     socialUrl: "https://twitter.com/me",
+    tileIndex: 42,
+    reservationToken: "abcdef1234567890",
   };
 
   it("accepts valid input and upper-cases the country", () => {

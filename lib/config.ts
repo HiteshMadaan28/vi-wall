@@ -44,6 +44,12 @@ export const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || ""
 export const CONTACT_EMAIL =
   process.env.NEXT_PUBLIC_CONTACT_EMAIL || "contact@example.com";
 
+/** How long a selected tile stays reserved while the user verifies (minutes). */
+export const RESERVATION_MINUTES = intFromEnv(
+  process.env.NEXT_PUBLIC_RESERVATION_MINUTES,
+  10
+);
+
 export const MESSAGE_MAX_LENGTH = 140;
 export const USERNAME_MIN_LENGTH = 3;
 export const USERNAME_MAX_LENGTH = 20;

@@ -48,27 +48,72 @@ export async function getStats(): Promise<WallStats> {
     totalPlayers: 0,
     totalTiles: 0,
     wallCapacity: WALL_CAPACITY,
+    availableTiles: WALL_CAPACITY,
+    pendingReservations: 0,
+    completionPercent: 0,
+    completed: false,
+    completedAt: null,
     participatingCountries: 0,
     fillPercent: 0,
     leader: null,
   };
   if (!db) return base;
 
+  // opportunistically free expired reservations so counts stay honest
+  await db.rpc("release_expired_reservations");
+
   const tallies = await countryTallies();
   const ranked = rankCountries(tallies, WALL_CAPACITY);
   const totalTiles = tallies.reduce((s, t) => s + t.tiles, 0);
   const leader = ranked[0] ?? null;
 
+  const { count: reservedCount } = await db
+    .from("wall_tiles")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "reserved");
+
+  const { data: stateRow } = await db
+    .from("wall_state")
+    .select("completed_at")
+    .eq("id", 1)
+    .maybeSingle();
+  const completedAt = (stateRow as { completed_at: string | null } | null)?.completed_at ?? null;
+
+  const pendingReservations = reservedCount ?? 0;
+
   return {
     ...base,
     totalPlayers: totalTiles, // one approved participant == one occupied tile
     totalTiles,
+    availableTiles: Math.max(0, WALL_CAPACITY - totalTiles - pendingReservations),
+    pendingReservations,
+    completionPercent: wallFillPercent(totalTiles, WALL_CAPACITY),
+    completed: Boolean(completedAt),
+    completedAt,
     participatingCountries: ranked.length,
     fillPercent: wallFillPercent(totalTiles, WALL_CAPACITY),
     leader: leader
       ? { iso: leader.iso, name: leader.name, flag: leader.flag, tiles: leader.tiles }
       : null,
   };
+}
+
+/** Reserved (mid-claim) tiles for the wall — positions only, no participant data. */
+export async function getReservedTiles(): Promise<{ tileIndex: number; x: number; y: number }[]> {
+  const db = getAdminClient();
+  if (!db) return [];
+  await db.rpc("release_expired_reservations");
+  const { data, error } = await db
+    .from("wall_tiles")
+    .select("tile_index, x_position, y_position")
+    .eq("status", "reserved");
+  if (error || !data) return [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (data as any[]).map((r) => ({
+    tileIndex: r.tile_index,
+    x: r.x_position,
+    y: r.y_position,
+  }));
 }
 
 export async function getLeaderboard(limit?: number): Promise<RankedCountry[]> {

@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { CheckCircle2, Loader2, Mail, AlertTriangle } from "lucide-react";
-import { claimSchema, AVATAR_PRESETS, type ClaimInput, type ClaimFormValues } from "@/lib/validation";
+import { claimFormSchema, AVATAR_PRESETS, type ClaimFormOutput, type ClaimFormValues } from "@/lib/validation";
 import { AVATAR_META } from "@/lib/avatars";
 import { COUNTRIES } from "@/lib/countries";
 import { MESSAGE_MAX_LENGTH } from "@/lib/config";
@@ -15,7 +15,15 @@ type Stage =
   | { kind: "form" }
   | { kind: "pending"; emailSent: boolean; devVerifyUrl?: string };
 
-export function ClaimForm() {
+export function ClaimForm({
+  tileIndex,
+  reservationToken,
+  onReservationLost,
+}: {
+  tileIndex: number;
+  reservationToken: string;
+  onReservationLost: () => void;
+}) {
   const [stage, setStage] = useState<Stage>({ kind: "form" });
   const [serverError, setServerError] = useState<string | null>(null);
 
@@ -26,8 +34,8 @@ export function ClaimForm() {
     setValue,
     setError,
     formState: { errors, isSubmitting },
-  } = useForm<ClaimFormValues, unknown, ClaimInput>({
-    resolver: zodResolver(claimSchema),
+  } = useForm<ClaimFormValues, unknown, ClaimFormOutput>({
+    resolver: zodResolver(claimFormSchema),
     defaultValues: { avatar: "violet-orb", countryIso: "IN", message: "", socialUrl: "" },
   });
 
@@ -44,12 +52,17 @@ export function ClaimForm() {
     const res = await fetch("/api/claim", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
+      body: JSON.stringify({ ...values, tileIndex, reservationToken }),
     });
     const data = await res.json().catch(() => ({}));
 
     if (res.ok) {
       setStage({ kind: "pending", emailSent: data.emailSent, devVerifyUrl: data.devVerifyUrl });
+      return;
+    }
+
+    if (res.status === 409 && data.error === "reservation_expired") {
+      onReservationLost();
       return;
     }
 
@@ -108,10 +121,18 @@ export function ClaimForm() {
 
   return (
     <form onSubmit={onSubmit} className="rounded-2xl glass-strong p-6 sm:p-8">
-      <h2 className="font-display text-2xl font-bold">Claim your tile</h2>
-      <p className="mt-1 text-sm text-ink-dim">
-        One verified player gets one tile. Pick your country and plant your flag.
-      </p>
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <h2 className="font-display text-2xl font-bold">Your details</h2>
+          <p className="mt-1 text-sm text-ink-dim">
+            Verify your email to lock in your block and put your country on the board.
+          </p>
+        </div>
+        <span className="shrink-0 rounded-lg border border-white/10 bg-black/30 px-3 py-1.5 text-center">
+          <span className="block text-[10px] uppercase tracking-wide text-ink-faint">Your block</span>
+          <span className="font-display text-sm font-bold text-ink">VI-{String(tileIndex).padStart(5, "0")}</span>
+        </span>
+      </div>
 
       <div className="mt-6 grid gap-5">
         <Field label="Gaming username" error={errors.username?.message}>
