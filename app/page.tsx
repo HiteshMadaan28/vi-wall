@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { ArrowRight, Compass, Users, Globe2, Trophy } from "lucide-react";
+import { Compass, Users, Globe2, Trophy } from "lucide-react";
 import { getStats, getLeaderboard, getActivity } from "@/lib/data";
-import { StatsBar } from "@/components/StatsBar";
 import { ViWall } from "@/components/ViWall";
+import { HeroStats } from "@/components/HeroStats";
+import { HeroLegend } from "@/components/HeroLegend";
 import { WallCompletion } from "@/components/WallCompletion";
 import { Leaderboard } from "@/components/Leaderboard";
 import { ActivityFeed } from "@/components/ActivityFeed";
@@ -25,69 +26,56 @@ export default async function HomePage() {
     <>
       <HomeAnalytics />
 
-      {/* ---- Hero ---------------------------------------------------------- */}
-      <section className="relative mx-auto max-w-7xl px-4 pt-10 sm:px-6 sm:pt-14">
-        <div className="vi-grid-overlay pointer-events-none absolute inset-0 -z-10 opacity-40" />
-        <div className="grid items-center gap-8 lg:grid-cols-[1.05fr_1fr]">
-          <div>
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-ink-dim">
+      {/* ---- Cinematic hero ----------------------------------------------- */}
+      <section className="relative isolate overflow-hidden">
+        <div className="hero-bg" aria-hidden />
+
+        <div className="mx-auto max-w-7xl px-4 pb-10 pt-8 sm:px-6 sm:pt-12">
+          {/* brand + tagline */}
+          <div className="text-center">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-black/30 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-ink-dim backdrop-blur">
               Unofficial fan project
             </span>
-            <h1 className="mt-4 font-display text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">
-              ONE WORLD.
-              <br />
-              MILLIONS OF PLAYERS.
-              <br />
-              <span className="neon-text">ONE GIANT VI.</span>
+            <h1 className="mt-4 font-display text-3xl font-bold tracking-tight sm:text-5xl">
+              THE <span className="neon-text">VI</span> WALL
             </h1>
-            <p className="mt-5 max-w-xl text-lg text-ink-dim">
-              Claim your own block, represent your country, and become part of a
-              global gaming monument.
+            <p className="mx-auto mt-2 max-w-xl text-base text-ink-dim sm:text-lg">
+              One world. Millions of players. One giant VI.
             </p>
-
-            <div className="mt-7 flex flex-wrap items-center gap-3">
-              <Link href="/claim" className="inline-flex items-center gap-2 rounded-xl btn-neon px-6 py-3 font-display font-bold">
-                Claim Your Block <ArrowRight size={18} />
-              </Link>
-              <Link href="/wall" className="inline-flex items-center gap-2 rounded-xl btn-ghost px-6 py-3 font-display font-bold">
-                <Compass size={18} /> Explore the Wall
-              </Link>
-            </div>
-
-            <div className="mt-6">
+            <div className="mt-4 flex justify-center">
               <Countdown />
             </div>
           </div>
 
-          {/* The VI wall is the visual centerpiece, visible immediately. */}
-          <div>
-            <ViWall compact />
+          {/* three-area layout: stats · VI · legend+CTA */}
+          <div className="mt-8 grid items-center gap-5 lg:grid-cols-[250px_1fr_250px]">
+            <div className="order-2 lg:order-1">
+              <HeroStats initial={stats} />
+            </div>
+
+            <div className="order-1 lg:order-2">
+              <ViWall
+                transparent
+                glow
+                heightClass="h-[clamp(300px,52vh,560px)]"
+              />
+            </div>
+
+            <div className="order-3">
+              <HeroLegend />
+            </div>
+          </div>
+
+          <div className="mt-6 flex justify-center lg:hidden">
+            <Link href="/wall" className="inline-flex items-center gap-2 rounded-xl btn-ghost px-6 py-3 font-display font-bold">
+              <Compass size={18} /> Explore the Wall
+            </Link>
           </div>
         </div>
-
-        <div className="mt-10">
-          <StatsBar initial={stats} />
-        </div>
-      </section>
-
-      {/* ---- Main VI wall -------------------------------------------------- */}
-      <section className="mx-auto mt-14 max-w-7xl px-4 sm:px-6">
-        <div className="mb-4 flex items-end justify-between">
-          <div>
-            <h2 className="font-display text-2xl font-bold">The VI Wall</h2>
-            <p className="text-sm text-ink-dim">
-              One continuous sunset gradient. Every block is one person.
-            </p>
-          </div>
-          <Link href="/claim" className="text-sm font-semibold text-neon-violet hover:text-neon-pink">
-            Claim a block →
-          </Link>
-        </div>
-        <ViWall />
       </section>
 
       {/* ---- Wall completion ---------------------------------------------- */}
-      <section className="mx-auto mt-6 max-w-7xl px-4 sm:px-6">
+      <section className="mx-auto mt-10 max-w-7xl px-4 sm:px-6">
         <WallCompletion initial={stats} />
       </section>
 

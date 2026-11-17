@@ -36,12 +36,21 @@ export function ViWall({
   mode = "view",
   selectedTile = null,
   onSelectTile,
+  transparent = false,
+  glow = false,
+  heightClass,
 }: {
   highlightTile?: number | null;
   compact?: boolean;
   mode?: WallMode;
   selectedTile?: number | null;
   onSelectTile?: (tileIndex: number, pos: { x: number; y: number }) => void;
+  /** transparent wrapper so a background image shows behind the VI */
+  transparent?: boolean;
+  /** neon glow that follows the VI tile shape */
+  glow?: boolean;
+  /** override the wrapper height (Tailwind class) */
+  heightClass?: string;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -340,9 +349,9 @@ export function ViWall({
     <div className="relative">
       <div
         ref={wrapRef}
-        className={`relative w-full touch-none select-none overflow-hidden rounded-2xl border border-white/10 bg-[#0a0518] ${
-          compact ? "h-[340px]" : "h-[clamp(380px,64vh,680px)]"
-        }`}
+        className={`relative w-full touch-none select-none overflow-hidden rounded-2xl ${
+          transparent ? "" : "border border-white/10 bg-[#0a0518]"
+        } ${heightClass ?? (compact ? "h-[340px]" : "h-[clamp(380px,64vh,680px)]")}`}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -355,7 +364,10 @@ export function ViWall({
         onTouchEnd={onTouchEnd}
         style={{ cursor: dragRef.current.active ? "grabbing" : mode === "select" ? "crosshair" : "grab" }}
       >
-        <canvas ref={canvasRef} className="block h-full w-full" />
+        <canvas
+          ref={canvasRef}
+          className={`block h-full w-full ${glow ? "animate-vi-breathe" : ""}`}
+        />
 
         {loading && (
           <div className="pointer-events-none absolute inset-0 grid place-items-center">

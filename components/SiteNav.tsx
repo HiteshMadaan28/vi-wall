@@ -5,10 +5,11 @@ import { useState } from "react";
 import { Menu, X, Grid3x3 } from "lucide-react";
 
 const LINKS = [
-  { href: "/wall", label: "The Wall" },
+  { href: "/wall", label: "Explore Wall" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/battle", label: "Country Battle" },
-  { href: "/claim", label: "Claim Tile" },
+  { href: "/players", label: "Players" },
+  { href: "/about", label: "About" },
 ];
 
 export function SiteNav() {
@@ -40,7 +41,7 @@ export function SiteNav() {
             href="/claim"
             className="ml-2 rounded-lg btn-neon px-4 py-2 text-sm font-bold"
           >
-            Claim Your Tile
+            Claim a Block
           </Link>
         </div>
 
@@ -67,6 +68,13 @@ export function SiteNav() {
                 <Grid3x3 size={16} /> {l.label}
               </Link>
             ))}
+            <Link
+              href="/claim"
+              onClick={() => setOpen(false)}
+              className="mt-1 rounded-lg btn-neon px-3 py-3 text-center text-base font-bold"
+            >
+              Claim a Block
+            </Link>
           </div>
         </div>
       )}

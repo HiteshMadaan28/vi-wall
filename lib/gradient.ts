@@ -29,14 +29,16 @@ function hex(h: string): RGB {
   };
 }
 
-/** Sunset stops, top → bottom: violet → magenta → hot pink → rose → orange → warm yellow. */
+/** Sunset stops, top → bottom, matching the reference VI artwork:
+ *  electric violet → magenta → hot pink → coral → sunset orange → golden yellow. */
 const STOPS: Stop[] = [
-  { t: 0.0, color: hex("#7c3aed") }, // violet
-  { t: 0.22, color: hex("#a21caf") }, // magenta/purple
-  { t: 0.44, color: hex("#db2777") }, // hot pink
-  { t: 0.64, color: hex("#f43f5e") }, // rose
-  { t: 0.82, color: hex("#fb923c") }, // orange
-  { t: 1.0, color: hex("#fbbf24") }, // warm sunset yellow
+  { t: 0.0, color: hex("#8500ff") }, // electric violet
+  { t: 0.2, color: hex("#a800e0") }, // violet→magenta
+  { t: 0.4, color: hex("#e600c8") }, // magenta
+  { t: 0.56, color: hex("#ff278d") }, // hot pink
+  { t: 0.72, color: hex("#ff526d") }, // coral
+  { t: 0.87, color: hex("#ff812d") }, // sunset orange
+  { t: 1.0, color: hex("#ffd33d") }, // golden yellow
 ];
 
 function lerp(a: number, b: number, t: number): number {
