@@ -17,8 +17,9 @@
   --color-ink-dim: #b9a8e0;
   --color-ink-faint: #6d5a94;
 
-  --font-display: var(--font-display), "Segoe UI", system-ui, sans-serif;
-  --font-sans: var(--font-body), system-ui, sans-serif;
+  --font-display: "Orbitron", "Segoe UI", system-ui, sans-serif;
+  --font-sans: "Rajdhani", system-ui, sans-serif;
+  --font-body: "Rajdhani", system-ui, sans-serif;
 }
 
 html {

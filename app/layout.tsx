@@ -1,24 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Orbitron, Rajdhani } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, GA_MEASUREMENT_ID } from "@/lib/config";
 import { SiteNav } from "@/components/SiteNav";
 import { SiteFooter } from "@/components/SiteFooter";
 
-const display = Orbitron({
-  subsets: ["latin"],
-  variable: "--font-display",
-  weight: ["500", "700", "900"],
-  display: "swap",
-});
-
-const body = Rajdhani({
-  subsets: ["latin"],
-  variable: "--font-body",
-  weight: ["400", "500", "600", "700"],
-  display: "swap",
-});
+// Fonts are loaded via a plain stylesheet link in <head> (below) rather than
+// next/font, which fetches at build time and can crash the build on hosted CI.
+// The families are wired to CSS variables in globals.css.
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -53,7 +42,17 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable}`}>
+    <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* App Router loads these site-wide via the root layout head. */}
+        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className="vi-backdrop min-h-screen">
         {GA_MEASUREMENT_ID && (
           <>

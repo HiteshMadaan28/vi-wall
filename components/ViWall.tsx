@@ -131,7 +131,7 @@ export function ViWall({
         ctx.fill();
         if (tilePx > 12) {
           ctx.fillStyle = "rgba(255,255,255,0.92)";
-          ctx.font = `700 ${Math.floor(size * 0.6)}px var(--font-body), sans-serif`;
+          ctx.font = `700 ${Math.floor(size * 0.6)}px Rajdhani, system-ui, sans-serif`;
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.fillText(occ.username.charAt(0).toUpperCase(), x + size / 2, y + size / 2 + 0.5);
