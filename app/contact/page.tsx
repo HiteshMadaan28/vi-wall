@@ -18,9 +18,7 @@ export default function ContactPage() {
         <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
       </p>
       <p className="text-sm text-ink-faint">
-        This address is a placeholder configured via the
-        <code> NEXT_PUBLIC_CONTACT_EMAIL </code> environment variable. Set it to
-        your real contact address before going live.
+        We read every message and aim to reply within a few days.
       </p>
     </LegalShell>
   );
