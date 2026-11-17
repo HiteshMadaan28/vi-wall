@@ -1,103 +1,116 @@
-import Image from "next/image";
+import Link from "next/link";
+import { ArrowRight, Compass } from "lucide-react";
+import { getStats, getLeaderboard, getActivity } from "@/lib/data";
+import { StatsBar } from "@/components/StatsBar";
+import { ViWall } from "@/components/ViWall";
+import { Leaderboard } from "@/components/Leaderboard";
+import { ActivityFeed } from "@/components/ActivityFeed";
+import { CountryBattle } from "@/components/CountryBattle";
+import { SpotlightPlaceholder } from "@/components/SpotlightPlaceholder";
+import { PlayerSearch } from "@/components/PlayerSearch";
+import { Countdown } from "@/components/Countdown";
+import { HomeAnalytics } from "@/components/HomeAnalytics";
 
-export default function Home() {
+// Revalidate the server-rendered snapshot often; client components poll for
+// finer-grained freshness.
+export const revalidate = 15;
+
+export default async function HomePage() {
+  const [stats, leaderboard, activity] = await Promise.all([
+    getStats(),
+    getLeaderboard(10),
+    getActivity(20),
+  ]);
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <>
+      <HomeAnalytics />
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+      {/* ---- Hero ---------------------------------------------------------- */}
+      <section className="relative mx-auto max-w-7xl px-4 pt-10 sm:px-6 sm:pt-16">
+        <div className="vi-grid-overlay pointer-events-none absolute inset-0 -z-10 opacity-40" />
+        <div className="grid items-center gap-8 lg:grid-cols-[1.05fr_1fr]">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-ink-dim">
+              Unofficial fan project
+            </span>
+            <h1 className="mt-4 font-display text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">
+              ONE WORLD.
+              <br />
+              MILLIONS OF PLAYERS.
+              <br />
+              <span className="neon-text">ONE GIANT VI.</span>
+            </h1>
+            <p className="mt-5 max-w-xl text-lg text-ink-dim">
+              Every player represents a tile. Every tile represents a country.
+              Together, we&apos;re building a global gaming monument.
+            </p>
+
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <Link href="/claim" className="inline-flex items-center gap-2 rounded-xl btn-neon px-6 py-3 font-display font-bold">
+                Claim Your Tile <ArrowRight size={18} />
+              </Link>
+              <Link href="/wall" className="inline-flex items-center gap-2 rounded-xl btn-ghost px-6 py-3 font-display font-bold">
+                <Compass size={18} /> Explore the Wall
+              </Link>
+            </div>
+
+            <div className="mt-6">
+              <Countdown />
+            </div>
+          </div>
+
+          {/* The VI wall is the visual centerpiece, visible immediately. */}
+          <div>
+            <ViWall compact />
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+
+        <div className="mt-10">
+          <StatsBar initial={stats} />
+        </div>
+      </section>
+
+      {/* ---- Question banner ---------------------------------------------- */}
+      <section className="mx-auto mt-16 max-w-7xl px-4 sm:px-6">
+        <div className="rounded-2xl glass p-6 text-center sm:p-8">
+          <h2 className="font-display text-2xl font-black sm:text-3xl">
+            WHICH COUNTRY WILL <span className="neon-text">DOMINATE</span> THE VI WALL?
+          </h2>
+          <p className="mx-auto mt-2 max-w-2xl text-ink-dim">
+            Recognition, competition, belonging. Claim a tile, represent your
+            country, and climb the global leaderboard.
+          </p>
+        </div>
+      </section>
+
+      {/* ---- Leaderboard + Activity --------------------------------------- */}
+      <section className="mx-auto mt-10 grid max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-2">
+        <Leaderboard initial={leaderboard} limit={10} />
+        <ActivityFeed initial={activity} />
+      </section>
+
+      {/* ---- Battle + Search ---------------------------------------------- */}
+      <section className="mx-auto mt-6 grid max-w-7xl gap-6 px-4 sm:px-6 lg:grid-cols-2">
+        <CountryBattle initial={leaderboard} />
+        <PlayerSearch />
+      </section>
+
+      {/* ---- Full wall ---------------------------------------------------- */}
+      <section className="mx-auto mt-14 max-w-7xl px-4 sm:px-6">
+        <div className="mb-4 flex items-end justify-between">
+          <h2 className="font-display text-2xl font-bold">The VI Wall</h2>
+          <Link href="/wall" className="text-sm font-semibold text-neon-violet hover:text-neon-pink">
+            Open full view →
+          </Link>
+        </div>
+        <ViWall />
+      </section>
+
+      {/* ---- Spotlight placeholder ---------------------------------------- */}
+      <section className="mx-auto mt-10 max-w-7xl px-4 sm:px-6">
+        <SpotlightPlaceholder />
+      </section>
+    </>
   );
 }
